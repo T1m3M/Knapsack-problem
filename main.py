@@ -130,11 +130,48 @@ def mutation(genome, probability=0.5):
     return genome
 
 
-def run_evolution(cases):
-    genomes = population_generation(10, cases[0].numOfItems)
-    pair = selection_pair(genomes, cases[0].items, cases[0].knapsack.size)
-    print(pair)
-    print(crossover(pair[0], pair[1]))
+def run_evolution(case, population_size=10, generation_limit=100):
+    population = population_generation(population_size, case.numOfItems)
+
+    for generation_num in range(generation_limit):
+
+        # sorting the population from best to worst according to fitness score
+        population = sorted(
+            population,
+            key=lambda genome: fitness(genome, case.items, case.knapsack.size),
+            reverse=True
+        )
+
+        # applying elitism approach (best 2 solutions remains in next generation)
+        next_generation = population[:2]
+
+        # picking random pairs and applying mutations (if possible)
+        for j in range(int(len(population) / 2) - 1):
+            parents = selection_pair(population, case.items, case.knapsack.size)
+            offspring_a, offspring_b = crossover(parents[0], parents[1])
+
+            offspring_a = mutation(offspring_a)
+            offspring_b = mutation(offspring_b)
+
+            next_generation += [offspring_a, offspring_b]
+
+        population = next_generation
+
+    # sorting the population from best to worst according to fitness score
+    population = sorted(
+        population,
+        key=lambda genome: fitness(genome, case.items, case.knapsack.size),
+        reverse=True
+    )
+
+    # returning best solution and generation number
+    return population[0], generation_num + 1
+
+
+def decode_genome(items, genome):
+    for i in range(len(genome)):
+        if genome[i] == 1:
+            print(f"{items[i].weight} {items[i].value}")
 
 
 def main():
@@ -142,7 +179,17 @@ def main():
     cases = loading_test_cases()
 
     # evolution of the algorithm
-    run_evolution(cases)
+    solution, generation_num = run_evolution(cases[0])
+
+    total_weight = fitness(solution, cases[0].items, cases[0].knapsack.size)
+
+    print(f"Case #0: {total_weight}")
+    
+    # number of items that fit in knapsack
+    print(solution.count(1))
+
+    # decode genome to items
+    decode_genome(cases[0].items, solution)
 
 
 if __name__ == '__main__':
