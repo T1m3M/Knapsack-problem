@@ -110,8 +110,8 @@ def selection_pair(population, items, weight_limit):
 def crossover(genome_a, genome_b):
     # swapping chunks of bits at a random position
     random_position = randint(1, len(genome_a) - 1)
-    return genome_a[0:random_position] + genome_b[random_position:], \
-           genome_b[0:random_position] + genome_a[random_position:]
+    return genome_a[:random_position] + genome_b[random_position:], \
+           genome_b[:random_position] + genome_a[random_position:]
 
 
 def mutation(genome, probability=0.5):
@@ -158,7 +158,7 @@ def run_evolution(case, population_size=16, generation_limit=500):
     )
 
     # returning best solution and generation number
-    return population[0], generation_num + 1
+    return population[0]
 
 
 def decode_genome(items, genome):
@@ -175,7 +175,7 @@ def main():
     case_num = int(input("Pick a case [1-20] (inclusive): "))
 
     # evolution of the algorithm
-    solution, generation_num = run_evolution(cases[case_num - 1])
+    solution = run_evolution(cases[case_num - 1])
     total_weight = fitness(solution, cases[case_num - 1].items, cases[case_num - 1].knapsack.size)
 
     print(f"Case #{case_num}: {total_weight}")
