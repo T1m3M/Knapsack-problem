@@ -130,7 +130,7 @@ def mutation(genome, probability=0.5):
     return genome
 
 
-def run_evolution(case, population_size=10, generation_limit=100):
+def run_evolution(case, population_size=16, generation_limit=500):
     population = population_generation(population_size, case.numOfItems)
 
     for generation_num in range(generation_limit):
@@ -178,18 +178,20 @@ def main():
     # loading test cases in array of objects
     cases = loading_test_cases()
 
+    # control which test case to apply the algorithm to
+    case_num = int(input("Pick a case [1-20] (inclusive): "))
+
     # evolution of the algorithm
-    solution, generation_num = run_evolution(cases[0])
+    solution, generation_num = run_evolution(cases[case_num - 1])
+    total_weight = fitness(solution, cases[case_num - 1].items, cases[case_num - 1].knapsack.size)
 
-    total_weight = fitness(solution, cases[0].items, cases[0].knapsack.size)
+    print(f"Case #{case_num}: {total_weight}")
 
-    print(f"Case #0: {total_weight}")
-    
     # number of items that fit in knapsack
     print(solution.count(1))
 
     # decode genome to items
-    decode_genome(cases[0].items, solution)
+    decode_genome(cases[case_num - 1].items, solution)
 
 
 if __name__ == '__main__':
