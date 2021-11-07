@@ -10,13 +10,6 @@ class Item:
     def __init__(self, weight, value):
         self.weight = weight
         self.value = value
-        self.selected = False
-
-    def select(self):
-        self.selected = True
-
-    def deselect(self):
-        self.selected = False
 
 
 class Case:
