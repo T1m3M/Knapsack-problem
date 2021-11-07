@@ -1,3 +1,6 @@
+from random import choices, randint, randrange, random
+
+
 class Knapsack:
     def __init__(self, size):
         self.size = size
@@ -78,8 +81,68 @@ def loading_test_cases():
     return cases_parsing(cases_data)
 
 
+def genome_generation(genome_length):
+    return choices([0, 1], k=genome_length)
+
+
+def population_generation(population_size, genome_length):
+    return [genome_generation(genome_length) for _ in range(population_size)]
+
+
+def fitness(genome, items, weight_limit):
+    value = 0
+    weight = 0
+
+    # calculating score of genome if feasible
+    for i in range(len(genome)):
+        if genome[i] == 1:
+            weight += items[i].weight
+            value += items[i].value
+
+        if weight > weight_limit:
+            return 0
+
+    return value
+
+
+def selection_pair(population, items, weight_limit):
+    # selecting 2 pairs from population
+    return choices(
+        population=population,
+        weights=[fitness(genome, items, weight_limit) for genome in population],
+        k=2
+    )
+
+
+def crossover(genome_a, genome_b):
+    # swapping chunks of bits at a random position
+    random_position = randint(1, len(genome_a) - 1)
+    return genome_a[0:random_position] + genome_b[random_position:], \
+           genome_b[0:random_position] + genome_a[random_position:]
+
+
+def mutation(genome, probability=0.5):
+    # flipping a bit at random position
+    random_position = randrange(len(genome))
+    if random() <= probability:
+        genome[random_position] = abs(genome[random_position] - 1)
+
+    return genome
+
+
+def run_evolution(cases):
+    genomes = population_generation(10, cases[0].numOfItems)
+    pair = selection_pair(genomes, cases[0].items, cases[0].knapsack.size)
+    print(pair)
+    print(crossover(pair[0], pair[1]))
+
+
 def main():
+    # loading test cases in array of objects
     cases = loading_test_cases()
+
+    # evolution of the algorithm
+    run_evolution(cases)
 
 
 if __name__ == '__main__':
